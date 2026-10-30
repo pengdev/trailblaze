@@ -1,5 +1,6 @@
 package xyz.block.trailblaze.android.accessibility
 
+import xyz.block.trailblaze.toolcalls.commands.MultiTouchGesture
 import xyz.block.trailblaze.api.resolveImportantForAccessibilityFirst
 import android.content.Intent
 import android.graphics.Rect
@@ -511,6 +512,15 @@ class AccessibilityDeviceManager(
         "swipe from ($startX, $startY) to ($endX, $endY)",
       )
     }
+
+  /** Injects a multi-finger gesture (pinch, rotate, two-finger drag) and waits for the UI to settle.
+   *  Fails loudly on a cancelled/timed-out gesture — see [tap]'s kdoc. */
+  fun multiTouch(gesture: MultiTouchGesture) = dispatchAndAwaitSettleBlocking {
+    failIfGestureNotDispatched(
+      TrailblazeAccessibilityService.multiTouch(gesture),
+      "${gesture.fingers.size}-finger gesture over ${gesture.durationMs}ms",
+    )
+  }
 
   /** Scrolls forward (up) or backward (down) and waits for the UI to settle. Fails loudly on a
    *  cancelled/timed-out gesture — see [tap]'s kdoc. */

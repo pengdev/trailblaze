@@ -1,0 +1,18 @@
+# Gestures that need several fingers touching at once (map zoom, rotate, tilt). Only the Android
+# accessibility driver can inject them (simultaneous dispatchGesture strokes); the other drivers
+# have no equivalent, so this toolset is not offered there.
+#
+# `tapOnPoint` is opted in here because `core_interaction` deliberately leaves it out; it gives
+# `trailblaze tool` a coordinate tap for surfaces with no accessibility nodes, such as a GL map.
+# `inputText` and `dragByPoints` are `surfaceToLlm = false` (recording-only), so they are not
+# callable through `trailblaze tool` and are not listed.
+id: android_multi_touch
+description: "Two-finger pinch, rotate and drag, and a coordinate tap, for maps and other gesture surfaces."
+always_enabled: true
+drivers:
+  - android-ondevice-accessibility
+tools:
+  - pinch
+  - rotate
+  - twoFingerDrag
+  - tapOnPoint

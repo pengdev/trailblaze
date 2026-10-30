@@ -34,6 +34,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.datetime.Clock
 import maestro.TreeNode
+import xyz.block.trailblaze.toolcalls.commands.MultiTouchGesture
 import xyz.block.trailblaze.AdbCommandUtil
 import xyz.block.trailblaze.InstrumentationUtil
 import xyz.block.trailblaze.android.AndroidSdkVersion
@@ -2151,6 +2152,35 @@ class TrailblazeAccessibilityService : AccessibilityService() {
           .build()
 
       return internalDispatchGesture(gesture)
+    }
+
+    /**
+     * Dispatches every finger of [gesture] as its own stroke starting at the same instant, which is
+     * how `dispatchGesture` expresses simultaneous touches. A stroke is one finger: a path with a
+     * duration, so the finger moves along the path at constant speed for [MultiTouchGesture.durationMs].
+     * Goes through [internalDispatchGesture], so a cancelled or timed-out gesture reports `false`.
+     */
+    fun multiTouch(gesture: MultiTouchGesture): Boolean {
+      val maxStrokes = GestureDescription.getMaxStrokeCount()
+      require(gesture.fingers.size <= maxStrokes) {
+        "multi-touch gesture has ${gesture.fingers.size} fingers but the device allows $maxStrokes strokes"
+      }
+      val (width, height) = getScreenDimensions()
+      val builder = GestureDescription.Builder()
+      gesture.fingers.forEach { points ->
+        points.forEach { p ->
+          // A stroke outside the display is dropped or rejected by the system; say so instead.
+          require(p.x in 0f..width.toFloat() && p.y in 0f..height.toFloat()) {
+            "multi-touch point (${p.x}, ${p.y}) is outside the ${width}x$height screen"
+          }
+        }
+        val path = Path().apply {
+          moveTo(points.first().x, points.first().y)
+          points.drop(1).forEach { lineTo(it.x, it.y) }
+        }
+        builder.addStroke(GestureDescription.StrokeDescription(path, 0, gesture.durationMs))
+      }
+      return internalDispatchGesture(builder.build())
     }
 
     fun directionalSwipe(

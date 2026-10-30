@@ -8,6 +8,7 @@ import maestro.orchestra.HideKeyboardCommand
 import maestro.orchestra.InputRandomCommand
 import maestro.orchestra.InputTextCommand
 import maestro.orchestra.LaunchAppCommand
+import xyz.block.trailblaze.toolcalls.commands.MultiTouchGesture
 import xyz.block.trailblaze.AdbCommandUtil
 import xyz.block.trailblaze.AgentMemory
 import xyz.block.trailblaze.MaestroTrailblazeAgent
@@ -409,6 +410,23 @@ class AccessibilityTrailblazeAgent(
           )
         }
     }
+  }
+
+  /**
+   * Dispatches the gesture's fingers as simultaneous `dispatchGesture` strokes. Runs on the IO
+   * dispatcher like [waitForTreeChange]: `dispatchGesture` must not be called from the main thread
+   * and blocks until the gesture completes.
+   */
+  override suspend fun performMultiTouch(
+    gesture: MultiTouchGesture,
+    traceId: TraceId?,
+  ): TrailblazeToolResult = try {
+    withContext(Dispatchers.IO) { deviceManager.multiTouch(gesture) }
+    TrailblazeToolResult.Success(message = "${gesture.fingers.size}-finger gesture dispatched over ${gesture.durationMs}ms")
+  } catch (e: IllegalArgumentException) {
+    TrailblazeToolResult.Error.ExceptionThrown(errorMessage = e.message ?: "invalid multi-touch gesture")
+  } catch (e: IllegalStateException) {
+    TrailblazeToolResult.Error.ExceptionThrown(errorMessage = e.message ?: "multi-touch gesture was not dispatched")
   }
 
   /** Provides the screen state using the accessibility service (no Maestro driver). */
