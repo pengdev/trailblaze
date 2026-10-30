@@ -274,6 +274,20 @@ abstract class MaestroTrailblazeAgent(
     traceId: TraceId?,
   ): TrailblazeToolResult? = null
 
+  /**
+   * Injects a gesture with several fingers touching at once (pinch, rotate, two-finger drag).
+   *
+   * Override in driver-specific agents that can dispatch simultaneous touch strokes (today: the
+   * Android accessibility driver). The default returns null to signal "this driver cannot", and the
+   * calling tool reports that as an error instead of recording a gesture that never happened.
+   *
+   * @return A [TrailblazeToolResult] if the driver handled it, or null when unsupported.
+   */
+  open suspend fun performMultiTouch(
+    gesture: xyz.block.trailblaze.toolcalls.commands.MultiTouchGesture,
+    traceId: TraceId?,
+  ): TrailblazeToolResult? = null
+
   @Deprecated(
     message = "Use the suspend function runMaestroCommands() instead.",
     replaceWith = ReplaceWith("runMaestroCommands(maestroCommands, traceId)"),
