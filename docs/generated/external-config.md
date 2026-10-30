@@ -162,6 +162,7 @@ Toolsets are declared in `trailmaps/<id>/toolsets/*.yaml`. They are pure YAML gr
 | Toolset | Always Enabled | Compatible Drivers | Tool Count |
 | --- | --- | --- | ---: |
 | `android_framework` | Yes | `android-ondevice-accessibility` | 3 |
+| `android_multi_touch` | Yes | `android-ondevice-accessibility` | 4 |
 | `android_primitives` | Yes | `android-ondevice-accessibility`, `android-test` | 9 |
 | `compose_core` | No | `compose` | 6 |
 | `compose_verification` | No | `compose` | 3 |
