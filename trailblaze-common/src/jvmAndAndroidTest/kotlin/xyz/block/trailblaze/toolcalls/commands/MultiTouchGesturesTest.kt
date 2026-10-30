@@ -77,4 +77,12 @@ class MultiTouchGesturesTest {
     assertFailsWith<IllegalArgumentException> { MultiTouchGestures.twoFingerDrag(0f, 0f, 100f, 0f, 0f) }
     assertFailsWith<IllegalArgumentException> { MultiTouchGesture(listOf(listOf(TouchPoint(0f, 0f), TouchPoint(1f, 1f))), 100) }
   }
+
+  @Test
+  fun `default pinch duration scales with the span change and stays within 150 to 600 ms`() {
+    assertEquals(333L, MultiTouchGestures.defaultPinchDurationMs(200f, 700f))
+    assertEquals(150L, MultiTouchGestures.defaultPinchDurationMs(200f, 300f))
+    assertEquals(600L, MultiTouchGestures.defaultPinchDurationMs(100f, 1500f))
+    assertEquals(333L, MultiTouchGestures.defaultPinchDurationMs(700f, 200f))
+  }
 }

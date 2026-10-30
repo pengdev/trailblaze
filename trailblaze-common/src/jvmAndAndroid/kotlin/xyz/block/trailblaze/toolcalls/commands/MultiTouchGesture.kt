@@ -34,6 +34,13 @@ object MultiTouchGestures {
   /** Segments used to approximate the arc of a [rotate]. A straight chord would shrink the radius. */
   private const val ARC_STEPS = 16
 
+  /** Span change per ms a pinch needs for map views that ignore slow ones; the Maps SDK drops pinches under ~0.6dp/ms. */
+  private const val PINCH_SPAN_PX_PER_MS = 1.5f
+
+  /** A duration that keeps the span changing fast enough to register, clamped to 150..600 ms. */
+  fun defaultPinchDurationMs(startSpan: Float, endSpan: Float): Long =
+    (kotlin.math.abs(endSpan - startSpan) / PINCH_SPAN_PX_PER_MS).toLong().coerceIn(150L, 600L)
+
   /**
    * Two fingers on the line through ([centerX], [centerY]) at [angleDegrees] (0 = horizontal,
    * 90 = vertical), [startSpan] px apart, moving to [endSpan] px apart. A larger end span zooms in.

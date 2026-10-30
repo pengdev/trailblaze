@@ -25,8 +25,11 @@ data class PinchTrailblazeTool(
   val endSpan: Int,
   @param:LLMDescription("Angle of the line through both fingers: 0 = horizontal, 90 = vertical.")
   val angleDegrees: Int = 0,
-  @param:LLMDescription("How long the gesture takes, in ms. Default 600.")
-  val durationMs: Long = 600,
+  @param:LLMDescription(
+    "How long the gesture takes, in ms. Default: scaled to the span change (about 1.5 px of span per ms, " +
+      "150 to 600 ms), because some map views ignore a pinch that changes the span too slowly.",
+  )
+  val durationMs: Long? = null,
 ) : ExecutableTrailblazeTool {
 
   override suspend fun execute(
@@ -39,7 +42,7 @@ data class PinchTrailblazeTool(
         startSpan = startSpan.toFloat(),
         endSpan = endSpan.toFloat(),
         angleDegrees = angleDegrees.toFloat(),
-        durationMs = durationMs,
+        durationMs = durationMs ?: MultiTouchGestures.defaultPinchDurationMs(startSpan.toFloat(), endSpan.toFloat()),
       )
     } catch (e: IllegalArgumentException) {
       return TrailblazeToolResult.Error.ExceptionThrown(errorMessage = "pinch: ${e.message}", command = this)

@@ -35,7 +35,7 @@ Two-finger pinch around a point, in device pixels (element-bounds units). A larg
 - `angleDegrees` — `Integer`
   Angle of the line through both fingers: 0 = horizontal, 90 = vertical.
 - `durationMs` — `Integer`
-  How long the gesture takes, in ms. Default 600.
+  How long the gesture takes, in ms. Default: scaled to the span change (about 1.5 px of span per ms, 150 to 600 ms), because some map views ignore a pinch that changes the span too slowly.
 
 ## Output
 
